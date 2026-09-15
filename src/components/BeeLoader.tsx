@@ -38,19 +38,18 @@ export default function BeeLoader({
   return (
     <div className="fixed inset-0 z-[100] w-screen h-screen bg-cream-50/95 backdrop-blur-sm flex items-center justify-center">
       <div className="text-center px-6">
-        {animationData ? (
-          <div className={`${s.anim} mx-auto mb-4 drop-shadow-lg`}>
+        <div className={`${s.anim} mx-auto mb-4 drop-shadow-lg flex items-center justify-center`}>
+          {animationData ? (
             <Lottie
               src={animationData as never}
               loop={true}
               autoplay={true}
+              style={{ width: '100%', height: '100%' }}
             />
-          </div>
-        ) : (
-          <div className={`${s.anim} mx-auto mb-4 rounded-full bg-honey-400/20 flex items-center justify-center animate-pulse`}>
-            <span className={`${s.text} font-display font-bold text-honey-600`}>M</span>
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full" />
+          )}
+        </div>
 
         <h2 className={`font-display font-bold ${s.text} text-brown-800 mb-2 tracking-wide`}>
           {title}
