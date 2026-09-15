@@ -15,6 +15,7 @@ interface FormState {
   whatsapp: string
   instagram: string
   pix_key: string
+  pix_key_type: string
   pix_recipient_name: string
   pix_city: string
   shipping_type: 'free' | 'fixed'
@@ -46,6 +47,7 @@ export default function AdminSettings() {
     whatsapp: '',
     instagram: '',
     pix_key: '',
+    pix_key_type: '',
     pix_recipient_name: '',
     pix_city: '',
     shipping_type: 'fixed',
@@ -105,6 +107,7 @@ export default function AdminSettings() {
         whatsapp: settings.whatsapp || '',
         instagram: settings.instagram || '',
         pix_key: settings.pix_key || '',
+        pix_key_type: settings.pix_key_type !== undefined && settings.pix_key_type !== null ? settings.pix_key_type : '',
         pix_recipient_name: settings.pix_recipient_name || '',
         pix_city: settings.pix_city || '',
         shipping_type: settings.shipping_type || 'fixed',
@@ -245,6 +248,7 @@ export default function AdminSettings() {
         { key: 'whatsapp', value: form.whatsapp.trim() },
         { key: 'instagram', value: form.instagram.trim() },
         { key: 'pix_key', value: form.pix_key.trim() },
+        { key: 'pix_key_type', value: form.pix_key_type.trim() },
         { key: 'pix_recipient_name', value: form.pix_recipient_name.trim() },
         { key: 'pix_city', value: form.pix_city.trim() },
         { key: 'shipping_type', value: form.shipping_type },
@@ -388,8 +392,30 @@ export default function AdminSettings() {
                 className="input"
                 value={form.pix_key}
                 onChange={(e) => setForm({ ...form, pix_key: e.target.value })}
-                placeholder="CPF, CNPJ, email ou chave aleatória"
+                placeholder="Ex: (32) 99909-1336, cpf@cnpj.com ou chave aleatória"
               />
+              <p className="text-xs text-brown-500 mt-1">
+                Formato sugerido: Telefone com DDD ou CPF/CNPJ ou Email ou Chave Aleatória.
+              </p>
+            </div>
+
+            <div>
+              <label className="label">Tipo da Chave PIX</label>
+              <select
+                className="input"
+                value={form.pix_key_type}
+                onChange={(e) => setForm({ ...form, pix_key_type: e.target.value })}
+              >
+                <option value="">Automático (recomendado)</option>
+                <option value="phone">Telefone / Celular</option>
+                <option value="cpf">CPF</option>
+                <option value="cnpj">CNPJ</option>
+                <option value="email">E-mail</option>
+                <option value="random">Chave Aleatória</option>
+              </select>
+              <p className="text-xs text-brown-500 mt-1">
+                Selecione o tipo para garantir 100% de compatibilidade em todos os bancos.
+              </p>
             </div>
 
             <div>

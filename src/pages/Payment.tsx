@@ -171,6 +171,7 @@ export default function Payment() {
         const payload = generatePixPayload(
           {
             key: settings.pix_key,
+            keyType: (settings.pix_key_type || '') as any,
             recipientName: settings.pix_recipient_name,
             recipientCity: settings.pix_city,
           },

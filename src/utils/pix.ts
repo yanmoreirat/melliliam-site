@@ -38,10 +38,13 @@ function serialize(id: string, value: string): string {
   return id + size + value
 }
 
+export type PixKeyType = 'cpf' | 'cnpj' | 'phone' | 'email' | 'random'
+
 export interface PixConfig {
   key: string
   recipientName: string
   recipientCity: string
+  keyType?: PixKeyType
 }
 
 export interface PixPayload {
@@ -50,25 +53,102 @@ export interface PixPayload {
   amount: number
 }
 
-function sanitizePixKey(key: string): string {
+function looksLikeEmail(clean: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean.trim())
+}
+
+function looksLikeCpf(onlyDigits: string): boolean {
+  return /^\d{11}$/.test(onlyDigits)
+}
+
+function looksLikeCnpj(onlyDigits: string): boolean {
+  return /^\d{14}$/.test(onlyDigits)
+}
+
+function looksLikeRandomKey(clean: string): boolean {
+  const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+  if (uuid.test(clean.trim())) return true
+  if (clean.includes('-') && clean.length >= 32 && clean.length <= 40) return true
+  return false
+}
+
+function looksLikePhone(raw: string, onlyDigits: string): boolean {
+  if (/^\+/.test(raw.trim())) return true
+  if (/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(raw.trim())) return true
+  if (/^(\d{2})\s?\d{4,5}-?\d{4}$/.test(raw.trim())) return true
+  if (/^\d{10}$/.test(onlyDigits) || /^\d{11}$/.test(onlyDigits)) {
+    const ddd = parseInt(onlyDigits.slice(0, 2), 10)
+    if (ddd >= 11 && ddd <= 99) {
+      const third = onlyDigits.charAt(2)
+      if (onlyDigits.length === 11 && third === '9') return true
+      if (onlyDigits.length === 10 && (third === '2' || third === '3')) return true
+    }
+  }
+  return false
+}
+
+function normalizeBrazilianPhone(onlyDigits: string): string {
+  if (onlyDigits.startsWith('55') && (onlyDigits.length === 12 || onlyDigits.length === 13)) {
+    return '+' + onlyDigits
+  }
+  if (onlyDigits.length === 10 || onlyDigits.length === 11) {
+    return '+55' + onlyDigits
+  }
+  return onlyDigits
+}
+
+export function sanitizePixKey(key: string, explicitType?: PixKeyType): string {
   let clean = key.trim()
-  clean = clean.replace(/[\(\)\/]/g, '')
-  const looksLikeCpfCnpj = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(clean) ||
-    /^\d{11}$/.test(clean) ||
-    /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(clean) ||
-    /^\d{14}$/.test(clean)
-  const looksLikePhone = /^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(clean) ||
-    /^\+?\d{10,15}$/.test(clean.replace(/\D/g, ''))
-  const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)
-  if (looksLikeCpfCnpj || looksLikePhone) {
-    clean = clean.replace(/\D/g, '')
-  } else if (looksLikeEmail) {
-    clean = clean.toLowerCase().trim()
+  if (!clean) return ''
+
+  if (explicitType) {
+    const digits = clean.replace(/\D/g, '')
+    switch (explicitType) {
+      case 'email':
+        return clean.toLowerCase().trim().slice(0, 77)
+      case 'cpf':
+        return digits.slice(0, 11)
+      case 'cnpj':
+        return digits.slice(0, 14)
+      case 'phone':
+        return normalizeBrazilianPhone(digits).slice(0, 77)
+      case 'random':
+        return clean.trim().slice(0, 77)
+    }
   }
-  if (clean.length > 77) {
-    clean = clean.slice(0, 77)
+
+  const onlyDigits = clean.replace(/\D/g, '')
+  const normalizedInput = clean.replace(/[\(\)\-\s]/g, '')
+
+  if (looksLikeEmail(clean)) {
+    return clean.toLowerCase().trim().slice(0, 77)
   }
-  return clean
+
+  if (clean.startsWith('+') && /^\+\d{7,15}$/.test(onlyDigits ? clean : '')) {
+    return clean.trim().slice(0, 77)
+  }
+
+  if (looksLikeRandomKey(clean)) {
+    return clean.trim().slice(0, 77)
+  }
+
+  if (looksLikePhone(clean, onlyDigits)) {
+    return normalizeBrazilianPhone(onlyDigits).slice(0, 77)
+  }
+
+  if (looksLikeCnpj(onlyDigits)) {
+    return onlyDigits.slice(0, 14)
+  }
+
+  if (looksLikeCpf(onlyDigits)) {
+    return onlyDigits.slice(0, 11)
+  }
+
+  if (onlyDigits.length >= 6 && onlyDigits.length <= 15) {
+    return normalizeBrazilianPhone(onlyDigits).slice(0, 77)
+  }
+
+  return normalizedInput.slice(0, 77)
 }
 
 function sanitizeName(name: string, maxLen: number): string {
@@ -114,7 +194,7 @@ export function generatePixPayload(
     txid = '0'
   }
 
-  const sanitizedKey = sanitizePixKey(config.key)
+  const sanitizedKey = sanitizePixKey(config.key, config.keyType)
   const sanitizedName = sanitizeName(config.recipientName, 25)
   const sanitizedCity = sanitizeName(config.recipientCity, 15)
 
@@ -151,7 +231,16 @@ export function generatePixPayload(
   const crc = crc16ccittFalse(partial + crcId)
   const raw = partial + crcId + crc
 
-  console.log('PIX payload gerado:', { raw, amount, keyLen: config.key.length, nameLen: config.recipientName.length, cityLen: config.recipientCity.length, txid })
+  console.log('PIX payload gerado:', {
+    rawKey: config.key,
+    keyType: config.keyType ?? 'auto',
+    sanitizedKey,
+    sanitizedKeyLen: sanitizedKey.length,
+    amount,
+    recipientName: sanitizedName,
+    recipientCity: sanitizedCity,
+    txid,
+  })
 
   return {
     raw,

@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 import type { ShippingMode, ShippingOutsideBehavior } from '@/types'
+import type { PixKeyType } from '@/utils/pix'
 
 export interface SiteSettingsData {
   company_name: string
   whatsapp: string
   instagram: string
   pix_key: string
+  pix_key_type: string
   pix_recipient_name: string
   pix_city: string
   shipping_type: 'free' | 'fixed'
@@ -49,6 +51,7 @@ const DEFAULT_SETTINGS: SiteSettingsData = {
   whatsapp: '',
   instagram: '',
   pix_key: '',
+  pix_key_type: '',
   pix_recipient_name: '',
   pix_city: '',
   shipping_type: 'fixed',
@@ -102,6 +105,7 @@ export function useSiteSettings() {
         whatsapp: s.whatsapp || DEFAULT_SETTINGS.whatsapp,
         instagram: s.instagram || DEFAULT_SETTINGS.instagram,
         pix_key: s.pix_key || DEFAULT_SETTINGS.pix_key,
+        pix_key_type: s.pix_key_type !== undefined && s.pix_key_type !== null ? s.pix_key_type : DEFAULT_SETTINGS.pix_key_type,
         pix_recipient_name: s.pix_recipient_name || DEFAULT_SETTINGS.pix_recipient_name,
         pix_city: s.pix_city || DEFAULT_SETTINGS.pix_city,
         shipping_type: (s.shipping_type as 'free' | 'fixed') || DEFAULT_SETTINGS.shipping_type,
