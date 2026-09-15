@@ -53,7 +53,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       to={`/produto/${product.slug}`}
       className={clsx(
         'group flex flex-col bg-white rounded-2xl overflow-hidden border border-honey-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1',
-        !product.is_available && 'opacity-60 grayscale'
+        !product.is_available && 'opacity-90'
       )}
     >
       <div className="relative aspect-square overflow-hidden bg-cream-100">
@@ -62,7 +62,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             ref={imageRef}
             src={imageUrl}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className={clsx(
+              'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500',
+              !product.is_available && 'grayscale-[40%] opacity-90'
+            )}
             loading="lazy"
           />
         ) : (
@@ -76,18 +79,22 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {!product.is_available && (
-          <div className="absolute inset-0 bg-brown-900/50 flex items-center justify-center">
-            <span className="bg-cream-100 text-brown-800 px-4 py-2 rounded-full font-bold text-sm shadow-lg">
-              Indisponível
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
+            <span className="bg-red-600 text-white px-3 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider shadow-lg">
+              ESGOTADO
             </span>
           </div>
+        )}
+
+        {!product.is_available && (
+          <div className="absolute inset-0 bg-red-900/10 pointer-events-none" />
         )}
 
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
           <button
             onClick={handleAddToCart}
             disabled={!product.is_available}
-            className="w-10 h-10 rounded-full bg-white text-brown-700 shadow-md hover:bg-honey-50 hover:text-honey-700 flex items-center justify-center transition-colors disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-full bg-white text-brown-700 shadow-md hover:bg-honey-50 hover:text-honey-700 flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
             aria-label="Adicionar ao carrinho"
           >
             <ShoppingCart size={18} />

@@ -19,7 +19,7 @@ export function useProducts() {
       const { data: prods } = await supabase
         .from('products')
         .select('*')
-        .eq('is_available', true)
+        .eq('is_visible', true)
         .order('display_order', { ascending: true })
 
       const prodsTyped = (prods || []) as Array<{
@@ -31,6 +31,7 @@ export function useProducts() {
         price: number
         discount_percent: number
         is_available: boolean
+        is_visible: boolean
         display_order: number
         created_at: string
         updated_at: string

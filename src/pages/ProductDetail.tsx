@@ -357,8 +357,8 @@ export default function ProductDetail() {
                 Disponível em estoque
               </span>
             ) : (
-              <span className="badge bg-red-100 text-red-800 !px-3 !py-1 text-sm">
-                Indisponível
+              <span className="badge bg-red-600 text-white !px-3 !py-1 text-sm !font-bold !uppercase tracking-wider shadow-md">
+              ESGOTADO
               </span>
             )}
             {inCart > 0 && (
