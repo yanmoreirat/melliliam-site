@@ -7,7 +7,7 @@ import {
   Package,
   ArrowLeft,
 } from 'lucide-react'
-import { useProducts } from '@/hooks/useProducts'
+import { useProducts } from '@/contexts/ProductsContext'
 import ProductCard from '@/components/ProductCard'
 import clsx from 'clsx'
 

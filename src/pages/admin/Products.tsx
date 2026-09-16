@@ -71,7 +71,7 @@ export default function AdminProducts() {
 
   const handleToggleAvailable = async (product: Product) => {
     try {
-      setTogglingId(product.id)
+      setTogglingId(product.id + ':av')
       const table = supabase.from('products') as any
       const { error } = await table
         .update({
@@ -83,6 +83,30 @@ export default function AdminProducts() {
       setProducts((prev) =>
         prev.map((p) =>
           p.id === product.id ? { ...p, is_available: !p.is_available } : p
+        )
+      )
+      showToast('success', 'Status atualizado com sucesso!')
+    } catch (err: any) {
+      showToast('error', err.message || 'Erro ao atualizar')
+    } finally {
+      setTogglingId(null)
+    }
+  }
+
+  const handleToggleVisible = async (product: Product) => {
+    try {
+      setTogglingId(product.id + ':vis')
+      const table = supabase.from('products') as any
+      const { error } = await table
+        .update({
+          is_visible: !product.is_visible,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', product.id)
+      if (error) throw error
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === product.id ? { ...p, is_visible: !p.is_visible } : p
         )
       )
       showToast('success', 'Status atualizado com sucesso!')
@@ -193,6 +217,9 @@ export default function AdminProducts() {
                     Desconto
                   </th>
                   <th className="px-5 py-3 text-center text-xs font-semibold text-brown-600 uppercase tracking-wider">
+                    Exibir
+                  </th>
+                  <th className="px-5 py-3 text-center text-xs font-semibold text-brown-600 uppercase tracking-wider">
                     Disponível
                   </th>
                   <th className="px-5 py-3 text-center text-xs font-semibold text-brown-600 uppercase tracking-wider">
@@ -271,10 +298,27 @@ export default function AdminProducts() {
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap text-center">
                         <button
-                          onClick={() => handleToggleAvailable(product)}
-                          disabled={togglingId === product.id}
+                          onClick={() => handleToggleVisible(product)}
+                          disabled={togglingId === product.id + ':vis'}
                           className={`inline-flex items-center h-6 rounded-full w-11 transition-colors relative ${
-                            product.is_available ? 'bg-green-500' : 'bg-brown-300'
+                            product.is_visible ? 'bg-green-500' : 'bg-brown-300'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block w-5 h-5 transform rounded-full bg-white transition-transform shadow ${
+                              product.is_visible
+                                ? 'translate-x-5'
+                                : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => handleToggleAvailable(product)}
+                          disabled={togglingId === product.id + ':av'}
+                          className={`inline-flex items-center h-6 rounded-full w-11 transition-colors relative ${
+                            product.is_available ? 'bg-green-500' : 'bg-red-500'
                           }`}
                         >
                           <span

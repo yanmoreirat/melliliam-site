@@ -14,7 +14,7 @@ import {
   Package,
 } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import { supabase } from '@/lib/supabase'
 import { formatCurrency, calculateFinalPrice } from '@/utils/formatters'
 import clsx from 'clsx'

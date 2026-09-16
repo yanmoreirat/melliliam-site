@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 import clsx from 'clsx'
 import { supabase } from '@/lib/supabase'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import {
   formatCurrency,
   formatDate,

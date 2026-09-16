@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingCart, Menu, X, MessageCircle } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import { createWhatsAppLink } from '@/utils/formatters'
 import { useScrollY } from '@/hooks/useScrollY'
 import clsx from 'clsx'
@@ -52,9 +52,9 @@ export default function Header() {
           )}
           <div>
             <h1 className="font-display font-bold text-brown-800 text-xl sm:text-2xl leading-tight">
-              {settings.company_name}
+              {settings.company_name || 'MEL LILIAM'}
             </h1>
-            <p className="text-xs text-brown-500">Mel Artesanal</p>
+            <p className="text-xs text-brown-500">100% Orgânico</p>
           </div>
         </Link>
 

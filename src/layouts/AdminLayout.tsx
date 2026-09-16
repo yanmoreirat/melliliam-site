@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '@/contexts/AuthContext'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 const menuItems = [
   {

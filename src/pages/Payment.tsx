@@ -14,7 +14,7 @@ import {
   MapPin,
 } from 'lucide-react'
 import * as qrcode from 'qrcode'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import { supabase } from '@/lib/supabase'
 import { generatePixPayload } from '@/utils/pix'
 import {
@@ -171,6 +171,7 @@ export default function Payment() {
         const payload = generatePixPayload(
           {
             key: settings.pix_key,
+            keyType: (settings.pix_key_type || '') as any,
             recipientName: settings.pix_recipient_name,
             recipientCity: settings.pix_city,
           },

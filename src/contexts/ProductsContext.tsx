@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Product, ProductImage } from '@/types'
 
@@ -9,7 +9,15 @@ const getImageUrl = (storagePath: string) => {
   return data?.publicUrl || ''
 }
 
-export function useProducts() {
+interface ProductsContextType {
+  products: Product[]
+  loading: boolean
+  reloadProducts: () => Promise<void>
+}
+
+const ProductsContext = createContext<ProductsContextType | undefined>(undefined)
+
+export function ProductsProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -69,7 +77,19 @@ export function useProducts() {
     loadProducts()
   }, [])
 
-  return { products, loading, reloadProducts: loadProducts }
+  return (
+    <ProductsContext.Provider value={{ products, loading, reloadProducts: loadProducts }}>
+      {children}
+    </ProductsContext.Provider>
+  )
+}
+
+export function useProducts() {
+  const context = useContext(ProductsContext)
+  if (context === undefined) {
+    throw new Error('useProducts must be used within a ProductsProvider')
+  }
+  return context
 }
 
 export function useProductBySlug(slug: string) {

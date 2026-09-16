@@ -13,7 +13,7 @@ import {
   ArrowLeft,
   MapPin,
 } from 'lucide-react'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import { supabase } from '@/lib/supabase'
 import {
   formatCurrency,

@@ -1,8 +1,9 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { CartProvider } from '@/contexts/CartContext'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { SiteSettingsProvider, useSiteSettings } from '@/contexts/SiteSettingsContext'
+import { ProductsProvider } from '@/contexts/ProductsContext'
 import PublicLayout from '@/layouts/PublicLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 import Home from '@/pages/Home'
@@ -22,6 +23,16 @@ import AdminCoupons from '@/pages/admin/Coupons'
 import AdminSettings from '@/pages/admin/Settings'
 import AdminContent from '@/pages/admin/Content'
 import AdminRoute from '@/components/AdminRoute'
+
+function ScrollToTop() {
+  const { pathname, search } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
+  }, [pathname, search])
+
+  return null
+}
 
 function FaviconUpdater() {
   const { settings } = useSiteSettings()
@@ -53,6 +64,7 @@ function FaviconUpdater() {
 function AppContent() {
   return (
     <>
+      <ScrollToTop />
       <FaviconUpdater />
       <Routes>
         <Route element={<PublicLayout />}>
@@ -92,9 +104,13 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
+      <SiteSettingsProvider>
+        <ProductsProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </ProductsProvider>
+      </SiteSettingsProvider>
     </AuthProvider>
   )
 }

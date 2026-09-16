@@ -7,6 +7,7 @@ export interface Product {
   price: number
   discount_percent: number
   is_available: boolean
+  is_visible: boolean
   display_order: number
   created_at: string
   updated_at: string

@@ -48,6 +48,7 @@ export default function AdminProductForm() {
   const [price, setPrice] = useState<number>(0)
   const [discount_percent, setDiscountPercent] = useState<number>(0)
   const [is_available, setIsAvailable] = useState(true)
+  const [is_visible, setIsVisible] = useState(true)
   const [display_order, setDisplayOrder] = useState<number>(0)
 
   const [images, setImages] = useState<ImageFormItem[]>([])
@@ -86,6 +87,7 @@ export default function AdminProductForm() {
       setPrice(p.price)
       setDiscountPercent(p.discount_percent || 0)
       setIsAvailable(p.is_available)
+      setIsVisible(p.is_visible !== undefined ? !!p.is_visible : true)
       setDisplayOrder(p.display_order || 0)
 
       const existing = ((p.images || []) as ProductImage[])
@@ -199,6 +201,7 @@ export default function AdminProductForm() {
         price: Number(price) || 0,
         discount_percent: Number(discount_percent) || 0,
         is_available: !!is_available,
+        is_visible: !!is_visible,
         display_order: Number(display_order) || 0,
         updated_at: new Date().toISOString(),
       }
@@ -467,26 +470,50 @@ export default function AdminProductForm() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsAvailable(!is_available)}
-                className={`inline-flex items-center h-7 rounded-full w-12 transition-colors relative ${
-                  is_available ? 'bg-green-500' : 'bg-brown-300'
-                }`}
-              >
-                <span
-                  className={`inline-block w-5 h-5 transform rounded-full bg-white transition-transform shadow ${
-                    is_available ? 'translate-x-6' : 'translate-x-1'
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsVisible(!is_visible)}
+                  className={`inline-flex items-center h-7 rounded-full w-12 transition-colors relative ${
+                    is_visible ? 'bg-green-500' : 'bg-brown-300'
                   }`}
-                />
-              </button>
-              <label
-                className="label !mb-0 cursor-pointer"
-                onClick={() => setIsAvailable(!is_available)}
-              >
-                Produto disponível para venda
-              </label>
+                >
+                  <span
+                    className={`inline-block w-5 h-5 transform rounded-full bg-white transition-transform shadow ${
+                      is_visible ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <label
+                  className="label !mb-0 cursor-pointer"
+                  onClick={() => setIsVisible(!is_visible)}
+                >
+                  Exibir na página de vendas (clientes veem o produto)
+                </label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAvailable(!is_available)}
+                  className={`inline-flex items-center h-7 rounded-full w-12 transition-colors relative ${
+                    is_available ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                >
+                  <span
+                    className={`inline-block w-5 h-5 transform rounded-full bg-white transition-transform shadow ${
+                      is_available ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <label
+                  className="label !mb-0 cursor-pointer"
+                  onClick={() => setIsAvailable(!is_available)}
+                >
+                  Disponível para venda (se desligado, mostra etiqueta "ESGOTADO" em vermelho)
+                </label>
+              </div>
             </div>
           </div>
 

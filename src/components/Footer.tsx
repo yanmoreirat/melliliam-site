@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { MessageCircle, ChevronRight, Package } from 'lucide-react'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import { createWhatsAppLink } from '@/utils/formatters'
 import BeeHiveDecor from './BeeHiveDecor'
 
@@ -84,7 +84,7 @@ export default function Footer() {
               )}
               <div>
                 <h3 className="font-display font-bold text-xl text-honey-300">
-                  {settings.company_name}
+                  {settings.company_name || 'MEL LILIAM'}
                 </h3>
                 <p className="text-xs text-brown-300">Mel Artesanal, Puro e 100% Orgânico</p>
               </div>
@@ -188,7 +188,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-brown-700 mt-10 pt-6 text-center text-brown-300 text-sm">
-          <p>{settings.footer_text}</p>
+          <p>{settings.footer_text || '© MEL LILIAM - Todos os direitos reservados.'}</p>
         </div>
       </div>
     </footer>

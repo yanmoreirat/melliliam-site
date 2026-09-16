@@ -17,8 +17,8 @@ import {
   MessageSquareHeart,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
-import { useProducts } from '@/hooks/useProducts'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
+import { useProducts } from '@/contexts/ProductsContext'
 import ProductCard from '@/components/ProductCard'
 import { createWhatsAppLink } from '@/utils/formatters'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
@@ -266,10 +266,10 @@ export default function Home() {
               style={{ animationDelay: heroText.inView ? '80ms' : undefined }}
             >
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-brown-900 leading-tight">
-                {settings.home_title}
+                {settings.home_title || 'Mel Artesanal, Puro e 100% Orgânico'}
               </h1>
               <p className="text-lg lg:text-xl text-brown-700 leading-relaxed max-w-lg">
-                {settings.home_subtitle}
+                {settings.home_subtitle || 'Direto da nossa família para a sua mesa'}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link to="/produtos" className="btn-primary">
@@ -292,9 +292,7 @@ export default function Home() {
                   )}
                   style={{ animationDelay: heroText.inView ? '380ms' : undefined }}
                 >
-                  <MessageCircle className="w-4 h-4 text-green-600" />
-                  <span>Atendimento rápido no WhatsApp</span>
-                </div>
+                   </div>      
               )}
             </div>
             <div
@@ -758,11 +756,11 @@ export default function Home() {
               Apresentação da empresa
             </h2>
             <div className="space-y-4 text-cream-300 leading-relaxed text-base lg:text-lg whitespace-pre-wrap">
-              {settings.home_about || settingsLoading ? (
+              {settings.home_about ? (
                 settings.home_about
               ) : (
                 <span className="text-cream-400 italic">
-                  [Edite este texto no painel administrativo]
+                  [Edite este texto no painel administrativo] A MEL LILIAM é uma pequena empresa familiar com produção artesanal de mel.
                 </span>
               )}
             </div>
@@ -770,7 +768,7 @@ export default function Home() {
               {[
                 { icon: Heart, label: 'Feito com amor', delay: 0 },
                 { icon: Leaf, label: '100% Natural', delay: 1 },
-                { icon: Award, label: 'Qualidade', delay: 2 },
+                { icon: Award, label: 'Qualidade garantida', delay: 2 },
               ].map(({ icon: Icon, label, delay }) => (
                 <div
                   key={label}
@@ -815,7 +813,7 @@ export default function Home() {
             <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-20 h-1 bg-gradient-to-r from-transparent via-honey-500 to-transparent" />
           </div>
           <div className="card p-8 lg:p-12 text-left space-y-4 text-brown-700 leading-relaxed text-base lg:text-lg whitespace-pre-wrap">
-            {settings.home_story || settingsLoading ? (
+            {settings.home_story ? (
               settings.home_story
             ) : (
               <p className="text-brown-400 italic text-center">

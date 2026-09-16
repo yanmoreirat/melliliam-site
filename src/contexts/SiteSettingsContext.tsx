@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 
 import type { ShippingMode, ShippingOutsideBehavior } from '@/types'
@@ -59,12 +59,12 @@ const DEFAULT_SETTINGS: SiteSettingsData = {
   shipping_mode: 'fixed',
   shipping_outside_rules_behavior: 'block',
   shipping_blocked_message: 'No momento não entregamos em sua cidade. Consulte a opção de retirada na loja ou entre em contato pelo WhatsApp.',
-  home_title: 'Mel Artesanal, Puro e 100% Orgânico',
-  home_subtitle: 'Direto da nossa família para a sua mesa',
-  home_about: '[Edite este texto no painel administrativo] A MEL LILIAM é uma pequena empresa familiar com produção artesanal de mel.',
-  home_story: '[Edite este texto no painel administrativo] Nossa história começa com o cuidado e a dedicação no trato das abelhas...',
-  home_cta: 'Experimente o sabor autêntico do mel de verdade!',
-  footer_text: '© MEL LILIAM - Todos os direitos reservados.',
+  home_title: '',
+  home_subtitle: '',
+  home_about: '',
+  home_story: '',
+  home_cta: '',
+  footer_text: '',
   hero_image: '',
   about_image: '',
   site_logo_url: '',
@@ -76,8 +76,8 @@ const DEFAULT_SETTINGS: SiteSettingsData = {
   pickup_city_state: '',
   pickup_hours: '',
   testimonials_enabled: 'true',
-  testimonials_title: 'O que nossos clientes dizem',
-  testimonials_subtitle: 'Feedback de famílias que já provaram e aprovaram o nosso mel artesanal',
+  testimonials_title: '',
+  testimonials_subtitle: '',
   testimonials_autoplay: 'true',
   testimonials_interval_ms: '5000',
   gallery_story_enabled: 'true',
@@ -88,12 +88,21 @@ const DEFAULT_SETTINGS: SiteSettingsData = {
   gallery_about_interval_ms: '4500',
 }
 
-export function useSiteSettings() {
+interface SiteSettingsContextType {
+  settings: SiteSettingsData
+  loading: boolean
+  reloadSettings: () => Promise<void>
+}
+
+const SiteSettingsContext = createContext<SiteSettingsContextType | undefined>(undefined)
+
+export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettingsData>(DEFAULT_SETTINGS)
   const [loading, setLoading] = useState(true)
 
   const loadSettings = async () => {
     try {
+      setLoading(true)
       const { data } = await supabase.from('site_settings').select('*')
       const rows = (data || []) as Array<{ key: string; value: string }>
       if (rows.length === 0) return
@@ -101,7 +110,7 @@ export function useSiteSettings() {
       rows.forEach((item) => (s[item.key] = item.value))
       setSettings({
         ...DEFAULT_SETTINGS,
-        company_name: s.company_name || DEFAULT_SETTINGS.company_name,
+        company_name: s.company_name !== undefined && s.company_name !== null && s.company_name !== '' ? s.company_name : DEFAULT_SETTINGS.company_name,
         whatsapp: s.whatsapp || DEFAULT_SETTINGS.whatsapp,
         instagram: s.instagram || DEFAULT_SETTINGS.instagram,
         pix_key: s.pix_key || DEFAULT_SETTINGS.pix_key,
@@ -112,13 +121,13 @@ export function useSiteSettings() {
         shipping_value: s.shipping_value ? Number(s.shipping_value) : DEFAULT_SETTINGS.shipping_value,
         shipping_mode: (s.shipping_mode as ShippingMode) || DEFAULT_SETTINGS.shipping_mode,
         shipping_outside_rules_behavior: (s.shipping_outside_rules_behavior as ShippingOutsideBehavior) || DEFAULT_SETTINGS.shipping_outside_rules_behavior,
-        shipping_blocked_message: s.shipping_blocked_message || DEFAULT_SETTINGS.shipping_blocked_message,
-        home_title: s.home_title || DEFAULT_SETTINGS.home_title,
-        home_subtitle: s.home_subtitle || DEFAULT_SETTINGS.home_subtitle,
-        home_about: s.home_about || DEFAULT_SETTINGS.home_about,
-        home_story: s.home_story || DEFAULT_SETTINGS.home_story,
-        home_cta: s.home_cta || DEFAULT_SETTINGS.home_cta,
-        footer_text: s.footer_text || DEFAULT_SETTINGS.footer_text,
+        shipping_blocked_message: s.shipping_blocked_message !== undefined && s.shipping_blocked_message !== null && s.shipping_blocked_message !== '' ? s.shipping_blocked_message : DEFAULT_SETTINGS.shipping_blocked_message,
+        home_title: s.home_title !== undefined && s.home_title !== null ? s.home_title : DEFAULT_SETTINGS.home_title,
+        home_subtitle: s.home_subtitle !== undefined && s.home_subtitle !== null ? s.home_subtitle : DEFAULT_SETTINGS.home_subtitle,
+        home_about: s.home_about !== undefined && s.home_about !== null ? s.home_about : DEFAULT_SETTINGS.home_about,
+        home_story: s.home_story !== undefined && s.home_story !== null ? s.home_story : DEFAULT_SETTINGS.home_story,
+        home_cta: s.home_cta !== undefined && s.home_cta !== null ? s.home_cta : DEFAULT_SETTINGS.home_cta,
+        footer_text: s.footer_text !== undefined && s.footer_text !== null && s.footer_text !== '' ? s.footer_text : DEFAULT_SETTINGS.footer_text,
         hero_image: s.hero_image || DEFAULT_SETTINGS.hero_image,
         about_image: s.about_image || DEFAULT_SETTINGS.about_image,
         site_logo_url: s.site_logo_url || DEFAULT_SETTINGS.site_logo_url,
@@ -150,5 +159,17 @@ export function useSiteSettings() {
     loadSettings()
   }, [])
 
-  return { settings, loading, reloadSettings: loadSettings }
+  return (
+    <SiteSettingsContext.Provider value={{ settings, loading, reloadSettings: loadSettings }}>
+      {children}
+    </SiteSettingsContext.Provider>
+  )
+}
+
+export function useSiteSettings() {
+  const context = useContext(SiteSettingsContext)
+  if (context === undefined) {
+    throw new Error('useSiteSettings must be used within a SiteSettingsProvider')
+  }
+  return context
 }

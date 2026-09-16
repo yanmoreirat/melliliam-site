@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Save, Home, FileText, Upload, Trash2, Image as ImageIcon, MessageCircle, ChevronRight, Package, Plus, Pencil, X, MapPin, Star, Quote, Images, MessageSquareHeart, UserRound, Search, Monitor } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { useSiteSettings } from '@/hooks/useSiteSettings'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import BeeHiveDecor from '@/components/BeeHiveDecor'
 import type { Testimonial, GalleryImage, GallerySection } from '@/types'
 
